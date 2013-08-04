@@ -12,15 +12,23 @@
 #define DATA_PIN 6
 #define CLOCK_PIN 12
 
-LPD8806 strip = LPD8806(LED_COUNT, DATA_PIN, CLOCK_PIN);
+LPD8806 strip;
 
 void setup() {
+  strip = LPD8806(LED_COUNT, DATA_PIN, CLOCK_PIN);
+
   if (WAIT_FOR_KEYBOARD) {
     Serial.begin(9600);
-    while (!Serial) { }		// Wait for serial to initalize.
+
+    // Wait for serial to initalize.
+    while (!Serial) { }
 
   	Serial.println("Strike any key to start...");
+
+  	// Wait for the next keystroke.
   	while (!Serial.available()) { }
+
+  	// Clear the serial buffer.
     Serial.read();
   }
   
@@ -37,10 +45,18 @@ void loop() {
 
 void pauseOnKeystroke() {
   if (Serial.available()) {
+    // Clear the serial buffer.
     Serial.read();
+
     Serial.println("Paused. Strike any key to resume...");
+
+    // Turn all LEDs off.
     showColorOff();
-    while (!Serial.available());
+
+    // Wait for the next keystroke.
+    while (!Serial.available()) { }
+
+    // Clear the serial buffer.
     Serial.read();
   }
 }
@@ -66,14 +82,16 @@ void colorOff() {
 
 const int  CYCLE_MILLISECONDS = 5000; // 5 second breathing cycle.
 const uint8_t KEYFRAMES[]  = {
-   20, 21, 22, 24, 26, 28, 31, 34, 38, 41, 45, 50, 55, 60, 66, 73, 80, 87, 95,
-   103, 112, 121, 131, 141, 151, 161, 172, 182, 192, 202, 211,
-   220, 228, 236, 242, 247, 251, 254, 255
+  // Rising
+  20, 21, 22, 24, 26, 28, 31, 34, 38, 41, 45, 50, 55, 60, 66, 73, 80, 87, 95,
+  103, 112, 121, 131, 141, 151, 161, 172, 182, 192, 202, 211, 220, 228, 236,
+  242, 247, 251, 254, 255,
 
-   , 254, 251, 247, 242, 236, 228,
-   220, 211, 202, 192, 182, 172, 161, 151, 141, 131, 121, 112, 103, 95, 87,
-   80, 73, 66, 60, 55, 50, 45, 41, 38, 34, 31, 28, 26, 24, 22, 21, 20, 20, 20,
-   20, 20, 20, 20, 20, 20, 20, 20, 
+  // Falling
+  254, 251, 247, 242, 236, 228, 220, 211, 202, 192, 182, 172, 161, 151, 141,
+  131, 121, 112, 103, 95, 87, 80, 73, 66, 60, 55, 50, 45, 41, 38, 34, 31, 28,
+  26, 24, 22, 21, 20,
+  20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 
 };
 
 unsigned long lastBreath = 0.0;
